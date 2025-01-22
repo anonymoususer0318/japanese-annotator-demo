@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcript-Prompted Whisper with Dictionary-Enhanced Decoding for Japanese Speech Annotation</title>
+</head>
+<body>
+  <h1>Transcript-Prompted Whisper with Dictionary-Enhanced Decoding for Japanese Speech Annotation</h1>
+
+  <i>Anonymous submission to Interspeech 2025</i>
+  
+  <h2>Annotation Systems</h2>
+  <ul>
+    <li><b>Oracle</b>: manual annotation</li>
+    <li><b>NLP</b>: text-based annotation method, producing phrase-level graphemes, phonemic and prosodic labels</li>
+    <li><b>Annt-v1</b>: Annotation model conditioned solely on audio, producing phonemic and prosodic labels</li>
+    <li><b>Annt-v2</b>: Annotation model conditioned solely on audio, producing phrase-level graphemes, phonemic and prosodic labels</li>
+    <li><b>Annt-v3 (ours)</b>: Annotation model conditioned on audio-transcript pair, producing phrase-level graphemes, phonemic and prosodic labels</li>
+    <li><b>Annt-v4 (ours)</b>: Annt-v3 adopting a decoding strategy that leverages dictionary prior knowledge to reduce errors in phonemic labeling</li>
+  </ul>
+
+  <h2>Annotation Example</h2>
+
+  <p>Table below presents an example of annotations from different systems. Here, we only show graphemes and phonemic labels in alphabet for simplicity.</p>
+  
+  <b>Audio</b>
+  
+  <p><audio controls src="wavs/annotation_example.wav"></audio></p>
+  
+  <b>Transcript</b>
+  
+  <p>発芽した陰樹の苗は、次第に背が高くなり、やがて、先代の林冠を作った木と置き換わることで、森林はあまり変化せずにその状態を保つ、との考えがあった。</p>
+  
+  <table border="1">
+    <tr>
+      <tr>
+      <th>Model</th>
+      <th>Annotation</th>
+    </tr>
+    <tr>
+      <td rowspan="2">Oracle</td>
+      <td>発芽した　陰樹の　苗は　次第に　背が　高くなり　やがて　先代の　林冠を　作った　木と　置き換わる　ことで　森林は　あまり　変化　せずに　その状態を　保つ　との　考えが　あった</td>
+    </tr>
+    <tr>
+      <td>hatsugashita iNjuno naewa shidaini sega takakunari yagate seNdaino riNkaNo tsukuQta kito okikawaru kotode shiNriNwa amari heNka sezuni sonojootaio tamotsu tono kaNgaega aQta</td>
+    </tr>
+    <tr>
+      <td rowspan="2">NLP</td>
+      <td>発芽　した　陰樹の　苗は　次第に　背が　高くなり　やがて　先代の　林冠を　作った　木と　置き換わる　ことで　森林は　あまり　変化　せずに　その　状態を　保つ　との　考えが　あった</td>
+    </tr>
+    <tr>
+      <td>hatsuga shita <span style="color: red;">kage</span>juno naewa shidaini sega takakunari yagate seNdaino riNkaNo tsukuQta kito okikawaru kotode shiNriNwa amari heNka sezuni sono jootaio tamotsu tono kaNgaega aQta</td>
+    </tr>
+    <tr>
+      <td rowspan="2">Annt-v1</td>
+      <td style="text-align: center;">-</td>
+    </tr>
+    <tr>
+      <td>hatsugashita iN<span style="color: red;">ji</span>no naewa shidaini sega ta<span style="color: red;">ga</span>kunari yagate seNdaino riNkaNo tsukuQta kito okikawaru kotode shiN<span style="color: red;">ni</span>Nwa amariheNka sezuni sonojootaio tamotsu tono kaNgaega aQta</td>
+    </tr>
+    <tr>
+      <td rowspan="2">Annt-v2</td>
+      <td>発芽した　<span style="color: red;">印字</span>の　苗は　次第に　背が　高くなり　やがて　<span style="color: red;">仙台</span>の　林<span style="color: red;">間</span>を　作った　木と　置き換わる　ことで　<span style="color: red;">新任</span>は　余り変化　せずに　その状態を　保つ　との　考えが　あった</td>
+    </tr>
+    <tr>
+      <td>hatsugashita iN<span style="color: red;">ji</span>no naewa shidaini sega takakunari yagate seNdaino riNkaNo tsukuQta kito okikawaru kotode shiN<span style="color: red;">ni</span>Nwa amariheNka sezuni sonojootaio tamotsu tono kaNgaega aQta</td>
+    </tr>
+    <tr>
+      <td rowspan="2">Annt-v3</td>
+      <td>発芽した　陰樹の　苗は　次第に　背が　高くなり　やがて　先代の　林冠を　作った　木と　置き換わる　ことで　森林は　あまり変化　せずに　その状態を　保つ　との　考えが　あった</td>
+    </tr>
+    <tr>
+      <td>hatsugashita iNjuno naewa shidaini sega ta<span style="color: red;">ga</span>kunari yagate seNdaino riNkaNo tsukuQta kito okikawaru kotode shiNriNwa amariheNka sezuni sonojootaio tamotsu tono kaNgaega aQta</td>
+    </tr>
+    <tr>
+      <td rowspan="2">Annt-v4</td>
+      <td>発芽した　陰樹の　苗は　次第に　背が　高くなり　やがて　先代の　林冠を　作った　木と　置き換わる　ことで　森林は　あまり変化　せずに　その状態を　保つ　との　考えが　あった</td>
+    </tr>
+    <tr>
+      <td>hatsugashita iNjuno naewa shidaini sega takakunari yagate seNdaino riNkaNo tsukuQta kito okikawaru kotode shiNriNwa amariheNka sezuni sonojootaio tamotsu tono kaNgaega aQta</td>
+    </tr>
+  </table>
+  
+  <h2>TTS Audio Samples</h2>
+  
+  <h3>JVS [1]</h3>
+
+  <table border="1">
+    <colgroup>
+      <col style="width: 10%;">
+      <col style="width: 30%;">
+      <col style="width: 30%;">
+      <col style="width: 30%;">
+    </colgroup>
+    <tr>
+      <th>Model</th>
+      <th>これらの箱を車まで運ぶのを手伝ってくださいますか。</th>
+      <th>入り口で、靴を脱ぐことになっている。</th>
+      <th>彼等は、絵の描かれた布と合板を使って、ジープを戦車のように見せかけ、キャタピラの痕跡まで偽装する一方、戦車をトラックに見せかけたりもした。</th>
+    </tr>
+    <tr>
+      <td>Reference</td>
+      <td>
+          <audio controls src="wavs/jvs/1_ref.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/jvs/2_ref.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/jvs/3_ref.wav"></audio>
+      </td>
+    </tr>
+    <tr>
+      <td>NLP</td>
+      <td>
+          <audio controls src="wavs/jvs/1_nlp.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/jvs/2_nlp.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/jvs/3_nlp.wav"></audio>
+      </td>
+    </tr>  
+    <tr>
+      <td>Annt-v1</td>
+      <td>
+          <audio controls src="wavs/jvs/1_annt-v1.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/jvs/2_annt-v1.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/jvs/3_annt-v1.wav"></audio>
+      </td>
+    </tr>  
+    <tr>
+      <td>Annt-v2</td>
+      <td>
+          <audio controls src="wavs/jvs/1_annt-v2.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/jvs/2_annt-v2.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/jvs/3_annt-v2.wav"></audio>
+      </td>
+    </tr>  
+    <tr>
+      <td>Annt-v3</td>
+      <td>
+          <audio controls src="wavs/jvs/1_annt-v3.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/jvs/2_annt-v3.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/jvs/3_annt-v3.wav"></audio>
+      </td>
+    </tr>
+    <tr>
+      <td>Annt-v4</td>
+      <td>
+          <audio controls src="wavs/jvs/1_annt-v4.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/jvs/2_annt-v4.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/jvs/3_annt-v4.wav"></audio>
+      </td>
+    </tr>  
+  </table>
+  
+  <h3>PRIV</h3>
+  
+  <table border="1">
+    <colgroup>
+      <col style="width: 10%;">
+      <col style="width: 30%;">
+      <col style="width: 30%;">
+      <col style="width: 30%;">
+    </colgroup>
+    <tr>
+      <th>Model</th>
+      <th>もう少し深堀りしてみましょう。</th>
+      <th>一体どういうことなのでしょうか？</th>
+      <th>草の長く伸びている所を指さしていいました。</th>
+    </tr>
+    <tr>
+      <td>Reference</td>
+      <td>
+          <audio controls src="wavs/priv/1_ref.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/2_ref.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/3_ref.wav"></audio>
+      </td>
+    </tr>
+    <tr>
+      <td>Oracle</td>
+      <td>
+          <audio controls src="wavs/priv/1_oracle.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/2_oracle.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/3_oracle.wav"></audio>
+      </td>
+    </tr>  
+    <tr>
+      <td>NLP</td>
+      <td>
+          <audio controls src="wavs/priv/1_nlp.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/2_nlp.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/3_nlp.wav"></audio>
+      </td>
+    </tr>  
+    <tr>
+      <td>Annt-v1</td>
+      <td>
+          <audio controls src="wavs/priv/1_annt-v1.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/2_annt-v1.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/3_annt-v1.wav"></audio>
+      </td>
+    </tr>  
+    <tr>
+      <td>Annt-v2</td>
+      <td>
+          <audio controls src="wavs/priv/1_annt-v2.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/2_annt-v2.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/3_annt-v2.wav"></audio>
+      </td>
+    </tr>
+    <tr>
+      <td>Annt-v3</td>
+      <td>
+          <audio controls src="wavs/priv/1_annt-v3.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/2_annt-v3.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/3_annt-v3.wav"></audio>
+      </td>
+    </tr>
+    <tr>
+      <td>Annt-v4</td>
+      <td>
+          <audio controls src="wavs/priv/1_annt-v4.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/2_annt-v4.wav"></audio>
+      </td>
+      <td>
+        <audio controls src="wavs/priv/3_annt-v4.wav"></audio>
+      </td>
+    </tr> 
+  </table>
+
+  <h2>References</h2>
+  
+  <p>[1]: Shinnosuke Takamichi, Kentaro Mitsui, Yuki Saito, Tomoki Koriyama, Naoko Tanji, and Hiroshi Saruwatari, "JVS corpus: free Japanese multi-speaker voice corpus," arXiv preprint, 1908.06248, Aug. 2019.</p>  
+</body>
